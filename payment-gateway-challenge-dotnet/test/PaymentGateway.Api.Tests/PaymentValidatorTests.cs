@@ -32,7 +32,7 @@ public class PaymentsValidatorTests
         paymentRequest.CardNumber = String.Empty; 
 
         // Act
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
         
         // Assert
         Assert.False(isValid);
@@ -47,7 +47,7 @@ public class PaymentsValidatorTests
         paymentRequest.CardNumber = "1234567890ABCD"; 
 
         // Act
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
         
         // Assert
         Assert.False(isValid);
@@ -62,7 +62,7 @@ public class PaymentsValidatorTests
         paymentRequest.CardNumber = "1234567890123"; 
 
         // Act
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
         
         // Assert
         Assert.False(isValid);
@@ -77,7 +77,7 @@ public class PaymentsValidatorTests
         paymentRequest.CardNumber = "12345678901234"; 
 
         // Act
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
         
         // Assert
         Assert.True(isValid);
@@ -91,7 +91,7 @@ public class PaymentsValidatorTests
         paymentRequest.CardNumber = "1234567890123456789"; 
 
         // Act
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
         
         // Assert
         Assert.True(isValid);
@@ -105,7 +105,7 @@ public class PaymentsValidatorTests
         paymentRequest.CardNumber = "12345678901234567890"; 
 
         // Act
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
         
         // Assert
         Assert.False(isValid);
@@ -120,11 +120,11 @@ public class PaymentsValidatorTests
         paymentRequest.ExpiryMonth = 0;
 
         // Act
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
         if (!isValid)
         {
             paymentRequest.ExpiryMonth = 13;
-            isValid = PaymentValidators.isValid(paymentRequest, out validationErrors);
+            isValid = PaymentValidator.isValid(paymentRequest, out validationErrors);
         }
 
         // Assert
@@ -144,7 +144,7 @@ public class PaymentsValidatorTests
         for (int expiryMonth = 1; expiryMonth <= 12; expiryMonth++)
         {
             paymentRequest.ExpiryMonth = expiryMonth;
-            isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+            isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
             if (!isValid)
             {
                 break;
@@ -164,7 +164,7 @@ public class PaymentsValidatorTests
         paymentRequest.ExpiryMonth = DateTime.Now.AddMonths(-1).Month;
 
         // Act
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
 
         // Assert
         Assert.False(isValid);
@@ -180,7 +180,7 @@ public class PaymentsValidatorTests
         paymentRequest.ExpiryMonth = DateTime.Now.Month;
 
         // Act
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
 
         // Assert
         Assert.True(isValid);
@@ -195,7 +195,7 @@ public class PaymentsValidatorTests
         paymentRequest.ExpiryMonth = DateTime.Now.Month;
 
         // Act
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
 
         // Assert
         Assert.True(isValid);
@@ -209,7 +209,7 @@ public class PaymentsValidatorTests
         paymentRequest.Currency = String.Empty; 
 
         // Act
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
         
         // Assert
         Assert.False(isValid);
@@ -224,7 +224,7 @@ public class PaymentsValidatorTests
 
         // Act
         paymentRequest.Currency = "USDC";
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
 
         // Assert
         Assert.False(isValid);
@@ -240,7 +240,7 @@ public class PaymentsValidatorTests
 
         // Act
         paymentRequest.Currency = "CAD";
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
 
         // Assert
         Assert.False(isValid);
@@ -256,16 +256,16 @@ public class PaymentsValidatorTests
 
         // Act
         paymentRequest.Currency = "USD";
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
         if (isValid)
         {
             paymentRequest.Currency = "GBP";
-            isValid = PaymentValidators.isValid(paymentRequest, out validationErrors);
+            isValid = PaymentValidator.isValid(paymentRequest, out validationErrors);
         }
         if (isValid)
         {
             paymentRequest.Currency = "EUR";
-            isValid = PaymentValidators.isValid(paymentRequest, out validationErrors);
+            isValid = PaymentValidator.isValid(paymentRequest, out validationErrors);
         }
 
         // Assert
@@ -280,7 +280,7 @@ public class PaymentsValidatorTests
         paymentRequest.Amount = -1;
 
         // Act
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
 
         // Assert
         Assert.False(isValid);
@@ -295,16 +295,16 @@ public class PaymentsValidatorTests
 
         // Act
         paymentRequest.Amount = 0;
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
         if (isValid)
         {
             paymentRequest.Amount = 1;
-            isValid = PaymentValidators.isValid(paymentRequest, out validationErrors);
+            isValid = PaymentValidator.isValid(paymentRequest, out validationErrors);
         }
         if (isValid)
         {
             paymentRequest.Amount = 1050;
-            isValid = PaymentValidators.isValid(paymentRequest, out validationErrors);
+            isValid = PaymentValidator.isValid(paymentRequest, out validationErrors);
         }
 
         // Assert
@@ -319,7 +319,7 @@ public class PaymentsValidatorTests
         paymentRequest.Cvv = String.Empty; 
 
         // Act
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
         
         // Assert
         Assert.False(isValid);
@@ -334,7 +334,7 @@ public class PaymentsValidatorTests
         paymentRequest.Cvv = "1AB"; 
 
         // Act
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
         
         // Assert
         Assert.False(isValid);
@@ -349,7 +349,7 @@ public class PaymentsValidatorTests
         paymentRequest.Cvv = "01"; 
 
         // Act
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
         
         // Assert
         Assert.False(isValid);
@@ -364,7 +364,7 @@ public class PaymentsValidatorTests
         paymentRequest.Cvv = "012"; 
 
         // Act
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
         
         // Assert
         Assert.True(isValid);
@@ -378,7 +378,7 @@ public class PaymentsValidatorTests
         paymentRequest.Cvv = "1234"; 
 
         // Act
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
         
         // Assert
         Assert.True(isValid);
@@ -392,7 +392,7 @@ public class PaymentsValidatorTests
         paymentRequest.Cvv = "00123"; 
 
         // Act
-        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        var isValid = PaymentValidator.isValid(paymentRequest, out List<string> validationErrors);
         
         // Assert
         Assert.False(isValid);

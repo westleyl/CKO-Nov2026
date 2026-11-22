@@ -2,7 +2,7 @@ using PaymentGateway.Api.Models.Requests;
 
 namespace PaymentGateway.Api.Services;
 
-public static class PaymentValidators
+public static class PaymentValidator
 {
     private static Dictionary<string, string> _validCurrencies = new Dictionary<string, string>
     {
