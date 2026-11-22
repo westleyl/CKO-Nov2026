@@ -110,4 +110,49 @@ public class PaymentsValidatorTests
         Assert.False(isValid);
         Assert.Contains("Card number must contain between 14 and 19 numeric characters", validationErrors);
     }
+
+    [Fact]
+    public async Task ExpiryMonthNotBetween1And12()
+    {
+        // Arrange
+        var paymentRequest = CreateValidPaymentRequest();
+        paymentRequest.ExpiryMonth = 0;
+
+        // Act
+        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        if (!isValid)
+        {
+            paymentRequest.ExpiryMonth = 13;
+            isValid = PaymentValidators.isValid(paymentRequest, out validationErrors);
+        }
+
+        // Assert
+        Assert.False(isValid);
+        Assert.Contains("Expiry month must have a value between 1 and 12", validationErrors);
+    }
+
+
+    [Fact]
+    public async Task ExpiryMonthBetween1And12()
+    {
+        // Arrange
+        var paymentRequest = CreateValidPaymentRequest();
+        paymentRequest.ExpiryMonth = 1;
+
+        // Act
+        var isValid = false;
+        for (int expiryMonth = 1; expiryMonth <= 12; expiryMonth++)
+        {
+            paymentRequest.ExpiryMonth = expiryMonth;
+            isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+            if (!isValid)
+            {
+                break;
+            }
+        }
+
+        // Assert
+        Assert.True(isValid);
+    }
+
 }

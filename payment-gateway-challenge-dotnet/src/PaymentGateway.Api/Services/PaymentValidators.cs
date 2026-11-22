@@ -8,6 +8,7 @@ public static class PaymentValidators
     {
         validationErrors = [];
 
+        // cardNumber checks - mutally exclusive checks 
         if (string.IsNullOrEmpty(paymentRequest.CardNumber))
         {
             validationErrors.Add("Card number is required");
@@ -19,6 +20,12 @@ public static class PaymentValidators
         else if(!paymentRequest.CardNumber.All(char.IsDigit))
         {
             validationErrors.Add("Card number must contain numeric characters (0-9) only");
+        }
+
+        // expiry month
+        if (paymentRequest.ExpiryMonth < 1 || paymentRequest.ExpiryMonth > 12)
+        {
+            validationErrors.Add("Expiry month must have a value between 1 and 12");
         }
 
         return validationErrors.Count == 0;
