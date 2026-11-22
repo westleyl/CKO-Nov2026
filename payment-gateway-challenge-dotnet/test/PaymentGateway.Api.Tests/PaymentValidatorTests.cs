@@ -112,7 +112,7 @@ public class PaymentsValidatorTests
     }
 
     [Fact]
-    public async Task ExpiryMonthNotBetween1And12()
+    public async Task ExpiryMonth_NotBetween1And12()
     {
         // Arrange
         var paymentRequest = CreateValidPaymentRequest();
@@ -132,7 +132,7 @@ public class PaymentsValidatorTests
     }
 
     [Fact]
-    public async Task ExpiryMonthBetween1And12()
+    public async Task ExpiryMonth_Between1And12()
     {
         // Arrange
         var paymentRequest = CreateValidPaymentRequest();
@@ -155,7 +155,7 @@ public class PaymentsValidatorTests
     }
 
     [Fact]
-    public async Task CombinationOfExpiryYearAndMonthInPast()
+    public async Task CombinationOfExpiryYearAndMonth_InPast()
     {
         // Arrange
         var paymentRequest = CreateValidPaymentRequest();
@@ -171,7 +171,7 @@ public class PaymentsValidatorTests
     }
 
     [Fact]
-    public async Task CombinationOfExpiryYearAndMonthInFutureCurrentMonth()
+    public async Task CombinationOfExpiryYearAndMonth_InFutureCurrentMonth()
     {
         // Arrange
         var paymentRequest = CreateValidPaymentRequest();
@@ -186,7 +186,7 @@ public class PaymentsValidatorTests
     }
 
     [Fact]
-    public async Task CombinationOfExpiryYearAndMonthInFutureNextYear()
+    public async Task CombinationOfExpiryYearAndMonth_InFutureNextYear()
     {
         // Arrange
         var paymentRequest = CreateValidPaymentRequest();
@@ -195,6 +195,77 @@ public class PaymentsValidatorTests
 
         // Act
         var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+
+        // Assert
+        Assert.True(isValid);
+    }
+
+    [Fact]
+    public async Task CurrencyCode_IsRequired()
+    {
+        // Arrange
+        var paymentRequest = CreateValidPaymentRequest();
+        paymentRequest.Currency = String.Empty; 
+
+        // Act
+        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        
+        // Assert
+        Assert.False(isValid);
+        Assert.Contains("Currency is required", validationErrors);
+    }
+
+    [Fact]
+    public async Task CurrencyCode_IncorrectFormat()
+    {
+        // Arrange
+        var paymentRequest = CreateValidPaymentRequest();
+
+        // Act
+        paymentRequest.Currency = "USDC";
+        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+
+        // Assert
+        Assert.False(isValid);
+        Assert.Contains("Currency must be a 3 character ISO 4217 currency code and by a supported currency", validationErrors);
+    }
+
+
+    [Fact]
+    public async Task CurrencyCode_ISOCodeNotSupportedCurrency()
+    {
+        // Arrange
+        var paymentRequest = CreateValidPaymentRequest();
+
+        // Act
+        paymentRequest.Currency = "CAD";
+        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+
+        // Assert
+        Assert.False(isValid);
+        Assert.Contains("Currency must be a 3 character ISO 4217 currency code and by a supported currency", validationErrors);
+    }
+
+
+    [Fact]
+    public async Task CurrencyCode_IsValid()
+    {
+        // Arrange
+        var paymentRequest = CreateValidPaymentRequest();
+
+        // Act
+        paymentRequest.Currency = "USD";
+        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        if (isValid)
+        {
+            paymentRequest.Currency = "GBP";
+            isValid = PaymentValidators.isValid(paymentRequest, out validationErrors);
+        }
+        if (isValid)
+        {
+            paymentRequest.Currency = "EUR";
+            isValid = PaymentValidators.isValid(paymentRequest, out validationErrors);
+        }
 
         // Assert
         Assert.True(isValid);

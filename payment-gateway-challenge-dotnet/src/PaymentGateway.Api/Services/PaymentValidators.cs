@@ -4,6 +4,13 @@ namespace PaymentGateway.Api.Services;
 
 public static class PaymentValidators
 {
+    private static Dictionary<string, string> validCurrencies = new Dictionary<string, string>
+    {
+        { "GBP", "British Pound" },
+        { "USD", "US Dollar" },
+        { "EUR", "Euro" }
+    };
+
     public static bool isValid(PostPaymentRequest paymentRequest, out List<String> validationErrors)
     {
         validationErrors = [];
@@ -36,6 +43,20 @@ public static class PaymentValidators
             } 
         }
         
+        // currency code
+        if (string.IsNullOrEmpty(paymentRequest.Currency))
+        {
+            validationErrors.Add("Currency is required");
+        }
+        else if (paymentRequest.Currency.Length != 3)
+        {
+            validationErrors.Add("Currency must be a 3 character ISO 4217 currency code and by a supported currency");
+        }
+        else if (!validCurrencies.ContainsKey(paymentRequest.Currency))
+        {
+            validationErrors.Add("Currency must be a 3 character ISO 4217 currency code and by a supported currency");
+        }
+
         return validationErrors.Count == 0;
     }
 }
