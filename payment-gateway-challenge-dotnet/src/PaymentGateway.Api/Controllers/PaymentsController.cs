@@ -13,13 +13,15 @@ public class PaymentsController : Controller
 {
     private readonly PaymentsRepository _paymentsRepository;
 
-    private static HttpClient _acquiringBank;
+    private static HttpClient _acquiringBankApi;
 
     public PaymentsController(PaymentsRepository paymentsRepository)
     {
         _paymentsRepository = paymentsRepository;
 
-        _acquiringBank = new HttpClient();
+        // would locate this from some service registry
+        _acquiringBankApi = new HttpClient();
+        _acquiringBankApi.BaseAddress = new System.Uri("http://localhost:8080/payments");
     }
 
     [HttpPost]
@@ -31,6 +33,17 @@ public class PaymentsController : Controller
             return new BadRequestObjectResult(validationErrors);
         }
 
+        var acquiringBankRequest = new PostPaymentToAcquiringBankRequest
+        {
+            Card_Number = request.CardNumber,
+            Expiry_Date = request.ExpiryMonth.ToString("D2") + "/" + request.ExpiryYear.ToString(),
+            Currency = request.Currency,
+            Amount = request.Amount,
+            Cvv = request.Cvv
+        };
+
+        HttpResponseMessage bankResponse = await _acquiringBankApi.PostAsJsonAsync("", acquiringBankRequest);
+
         var payment = new PostPaymentResponse
         {
             Id = Guid.NewGuid(),
@@ -40,6 +53,27 @@ public class PaymentsController : Controller
             CardNumberLastFour = Convert.ToInt32(request.CardNumber.Substring(request.CardNumber.Length - 4)),
             Currency = request.Currency
         };
+
+        if (bankResponse.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable) 
+        {
+           payment.Status = Models.PaymentStatus.Rejected;  
+        }
+        else if (bankResponse.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+           PostPaymentToAcquiringBankResponse acquiringBankResponse = await bankResponse.Content.ReadFromJsonAsync<PostPaymentToAcquiringBankResponse>();
+           if (acquiringBankResponse.Authorized)
+            {
+                payment.Status = Models.PaymentStatus.Authorized;
+            }
+            else
+            {
+                payment.Status = Models.PaymentStatus.Declined;   
+            }           
+        }
+        else
+        {
+            payment.Status = Models.PaymentStatus.Rejected;  
+        }
 
         _paymentsRepository.Add(payment);
 
