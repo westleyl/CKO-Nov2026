@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 
 using PaymentGateway.Api.Controllers;
+using PaymentGateway.Api.Models.Requests;
 using PaymentGateway.Api.Models.Responses;
 using PaymentGateway.Api.Services;
 
@@ -57,5 +58,28 @@ public class PaymentsControllerTests
         
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task PostCheckValidatorIsInvoked()
+    {
+        // Arrange
+        var webApplicationFactory = new WebApplicationFactory<PaymentsController>();
+        var client = webApplicationFactory.CreateClient();
+        var postPaymentRequest = new PostPaymentRequest
+        {
+            CardNumber = "12345678901234",
+            ExpiryMonth = 12,
+            ExpiryYear = DateTime.Now.Year + 1,
+            Amount = 1000,
+            Currency = "GBP",
+            Cvv = "1234"
+        };
+
+        // Act
+        var response = await client.PostAsJsonAsync($"/api/Payments", postPaymentRequest);
+        
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 }
