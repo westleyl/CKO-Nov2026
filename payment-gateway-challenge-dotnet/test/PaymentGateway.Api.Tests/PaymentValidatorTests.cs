@@ -131,7 +131,6 @@ public class PaymentsValidatorTests
         Assert.Contains("Expiry month must have a value between 1 and 12", validationErrors);
     }
 
-
     [Fact]
     public async Task ExpiryMonthBetween1And12()
     {
@@ -150,6 +149,52 @@ public class PaymentsValidatorTests
                 break;
             }
         }
+
+        // Assert
+        Assert.True(isValid);
+    }
+
+    [Fact]
+    public async Task CombinationOfExpiryYearAndMonthInPast()
+    {
+        // Arrange
+        var paymentRequest = CreateValidPaymentRequest();
+        paymentRequest.ExpiryYear = DateTime.Now.AddMonths(-1).Year;
+        paymentRequest.ExpiryMonth = DateTime.Now.AddMonths(-1).Month;
+
+        // Act
+        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+
+        // Assert
+        Assert.False(isValid);
+        Assert.Contains("Expiry date based on  year and month must be in the future", validationErrors);
+    }
+
+    [Fact]
+    public async Task CombinationOfExpiryYearAndMonthInFutureCurrentMonth()
+    {
+        // Arrange
+        var paymentRequest = CreateValidPaymentRequest();
+        paymentRequest.ExpiryYear = DateTime.Now.Year;
+        paymentRequest.ExpiryMonth = DateTime.Now.Month;
+
+        // Act
+        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+
+        // Assert
+        Assert.True(isValid);
+    }
+
+    [Fact]
+    public async Task CombinationOfExpiryYearAndMonthInFutureNextYear()
+    {
+        // Arrange
+        var paymentRequest = CreateValidPaymentRequest();
+        paymentRequest.ExpiryYear = DateTime.Now.AddYears(1).Year;
+        paymentRequest.ExpiryMonth = DateTime.Now.Month;
+
+        // Act
+        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
 
         // Assert
         Assert.True(isValid);

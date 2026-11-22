@@ -22,12 +22,20 @@ public static class PaymentValidators
             validationErrors.Add("Card number must contain numeric characters (0-9) only");
         }
 
-        // expiry month
+        // expiry month and year
         if (paymentRequest.ExpiryMonth < 1 || paymentRequest.ExpiryMonth > 12)
         {
             validationErrors.Add("Expiry month must have a value between 1 and 12");
         }
-
+        else
+        {
+            var expiryDate = new DateTime(paymentRequest.ExpiryYear, paymentRequest.ExpiryMonth, 1).AddMonths(1);
+            if (expiryDate < DateTime.Now)
+            {
+                validationErrors.Add("Expiry date based on  year and month must be in the future");
+            } 
+        }
+        
         return validationErrors.Count == 0;
     }
 }
