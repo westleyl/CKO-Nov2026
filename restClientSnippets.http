@@ -1,0 +1,42 @@
+# some test cases for the gateway API
+GET https://localhost:7092/api/Payments/A31E9256-905A-4F79-A44D-AAD324A30F20 HTTP/1.1
+
+###
+# some test cases for the banking emulator 
+# 0 - invalid request
+POST http://localhost:8080/payments HTTP/1.1
+Content-Type: application/json
+
+{
+  "card_number": "222240534324880",
+  "expiry_date": "04/2025",
+  "currency": "EUR",
+  "amount": 100,
+  "cvv": "123"
+}
+
+###
+# 1 - authorized
+POST http://localhost:8080/payments HTTP/1.1
+Content-Type: application/json
+
+{
+  "card_number": "222240534324881",
+  "expiry_date": "04/2025",
+  "currency": "USD",
+  "amount": 100,
+  "cvv": "123"
+}
+
+###
+# 2 - unauthorized
+POST http://localhost:8080/payments HTTP/1.1
+Content-Type: application/json
+
+{
+  "card_number": "222240534324882",
+  "expiry_date": "04/2025",
+  "currency": "GBP",
+  "amount": 100,
+  "cvv": "123"
+}
