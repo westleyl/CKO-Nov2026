@@ -271,4 +271,43 @@ public class PaymentsValidatorTests
         Assert.True(isValid);
     }
 
+    [Fact]
+    public async Task Amount_LessThanZero()
+    {
+        // Arrange
+        var paymentRequest = CreateValidPaymentRequest();
+        paymentRequest.Amount = -1;
+
+        // Act
+        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+
+        // Assert
+        Assert.False(isValid);
+        Assert.Contains("Amount must be greater than zero", validationErrors);
+    }
+
+    [Fact]
+    public async Task Amount_GreaterOrEqualToZero()
+    {
+        // Arrange
+        var paymentRequest = CreateValidPaymentRequest();
+
+        // Act
+        paymentRequest.Amount = 0;
+        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        if (isValid)
+        {
+            paymentRequest.Amount = 1;
+            isValid = PaymentValidators.isValid(paymentRequest, out validationErrors);
+        }
+        if (isValid)
+        {
+            paymentRequest.Amount = 1050;
+            isValid = PaymentValidators.isValid(paymentRequest, out validationErrors);
+        }
+
+        // Assert
+        Assert.True(isValid);
+    }
+
 }

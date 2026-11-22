@@ -57,6 +57,12 @@ public static class PaymentValidators
             validationErrors.Add("Currency must be a 3 character ISO 4217 currency code and by a supported currency");
         }
 
+        // Amount
+        if (paymentRequest.Amount < 0)
+        {
+            validationErrors.Add("Amount must be greater than zero");
+        }
+
         return validationErrors.Count == 0;
     }
 }
