@@ -83,7 +83,44 @@ public class PaymentsControllerTests
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
-        [Fact]
+    [Fact]
+    public async Task PostPaymentRequest_ValidData_CheckResponse_AndItIsInRepository()
+    {
+        // Arrange
+        var paymentsRepository = new PaymentsRepository();
+        PostPaymentResponse gatewayPostPaymentResponse;
+
+        var webApplicationFactory = new WebApplicationFactory<PaymentsController>();
+        var client = webApplicationFactory.WithWebHostBuilder(builder =>
+            builder.ConfigureServices(services => ((ServiceCollection)services)
+                .AddSingleton(paymentsRepository)))
+            .CreateClient();
+
+         var postPaymentRequest = new PostPaymentRequest
+        {
+            CardNumber = "12345678901234",
+            ExpiryMonth = 12,
+            ExpiryYear = DateTime.Now.Year + 1,
+            Amount = 1000,
+            Currency = "GBP",
+            Cvv = "1234"
+        };
+
+        // Act
+        var response = await client.PostAsJsonAsync($"/api/Payments", postPaymentRequest);
+        if (response.StatusCode == HttpStatusCode.Created)
+        {
+            gatewayPostPaymentResponse = await response.Content.ReadFromJsonAsync<PostPaymentResponse>();
+            // Assert
+            Assert.NotNull(paymentsRepository.Get(gatewayPostPaymentResponse.Id));
+        }
+        
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+
+
+    [Fact]
     public async Task PostPaymentRequest_CheckValidatorInvoked_InvalidCardNumber()
     {
         // Arrange
@@ -103,7 +140,7 @@ public class PaymentsControllerTests
         var response = await client.PostAsJsonAsync($"/api/Payments", postPaymentRequest);
         
         // Assert
-        Assert.Equal(HttpStatusCode.BadGateway, response.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
 }
