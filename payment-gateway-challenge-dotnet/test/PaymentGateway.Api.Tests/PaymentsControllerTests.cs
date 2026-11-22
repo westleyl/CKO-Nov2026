@@ -61,7 +61,7 @@ public class PaymentsControllerTests
     }
 
     [Fact]
-    public async Task PostCheckValidatorIsInvoked()
+    public async Task PostPaymentRequest_ValidData()
     {
         // Arrange
         var webApplicationFactory = new WebApplicationFactory<PaymentsController>();
@@ -80,6 +80,30 @@ public class PaymentsControllerTests
         var response = await client.PostAsJsonAsync($"/api/Payments", postPaymentRequest);
         
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
+
+        [Fact]
+    public async Task PostPaymentRequest_CheckValidatorInvoked_InvalidCardNumber()
+    {
+        // Arrange
+        var webApplicationFactory = new WebApplicationFactory<PaymentsController>();
+        var client = webApplicationFactory.CreateClient();
+        var postPaymentRequest = new PostPaymentRequest
+        {
+            CardNumber = "123ABC",
+            ExpiryMonth = 12,
+            ExpiryYear = DateTime.Now.Year + 1,
+            Amount = 1000,
+            Currency = "GBP",
+            Cvv = "1234"
+        };
+
+        // Act
+        var response = await client.PostAsJsonAsync($"/api/Payments", postPaymentRequest);
+        
+        // Assert
+        Assert.Equal(HttpStatusCode.BadGateway, response.StatusCode);
+    }
+
 }

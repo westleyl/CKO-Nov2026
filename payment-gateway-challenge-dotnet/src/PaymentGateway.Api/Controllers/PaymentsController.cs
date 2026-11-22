@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 using PaymentGateway.Api.Models.Requests;
 using PaymentGateway.Api.Models.Responses;
@@ -24,6 +25,12 @@ public class PaymentsController : Controller
     [HttpPost]
     public async Task<ActionResult<PostPaymentResponse>> PostPaymentAsync(PostPaymentRequest request)
     {
+        var isValid = PaymentValidator.isValid(request, out List<string> validationErrors);
+        if (!isValid)
+        {
+            return new BadRequestObjectResult(validationErrors);
+        }
+
         var payment = new PostPaymentResponse
         {
             Id = Guid.NewGuid(),
