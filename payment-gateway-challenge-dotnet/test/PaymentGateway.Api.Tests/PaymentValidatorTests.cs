@@ -19,7 +19,8 @@ public class PaymentsValidatorTests
             ExpiryMonth = 12,
             ExpiryYear = DateTime.Now.Year + 1,
             Amount = 1000,
-            Currency = "GBP"
+            Currency = "GBP",
+            Cvv = "1234"
         };
     }
     
@@ -308,6 +309,94 @@ public class PaymentsValidatorTests
 
         // Assert
         Assert.True(isValid);
+    }
+
+   [Fact]
+    public async Task Cvv_IsRequired()
+    {
+        // Arrange
+        var paymentRequest = CreateValidPaymentRequest();
+        paymentRequest.Cvv = String.Empty; 
+
+        // Act
+        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        
+        // Assert
+        Assert.False(isValid);
+        Assert.Contains("Cvv is required", validationErrors);
+    }
+
+    [Fact]
+    public async Task Cvv_ContainsOnlyNumericCharacters()
+    {
+        // Arrange
+        var paymentRequest = CreateValidPaymentRequest();
+        paymentRequest.Cvv = "1AB"; 
+
+        // Act
+        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        
+        // Assert
+        Assert.False(isValid);
+        Assert.Contains("Cvv must contain numeric characters (0-9) only", validationErrors);
+    }
+    
+    [Fact]
+    public async Task Cvv_IsTooShort()
+    {
+        // Arrange
+        var paymentRequest = CreateValidPaymentRequest();
+        paymentRequest.Cvv = "01"; 
+
+        // Act
+        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        
+        // Assert
+        Assert.False(isValid);
+        Assert.Contains("Cvv must contain between 3 and 4 numeric characters", validationErrors);
+    }
+
+    [Fact]
+    public async Task Cvv_IsMinimumLength()
+    {
+        // Arrange
+        var paymentRequest = CreateValidPaymentRequest();
+        paymentRequest.Cvv = "012"; 
+
+        // Act
+        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        
+        // Assert
+        Assert.True(isValid);
+    }
+
+    [Fact]
+    public async Task Cvv_IsMaximumLength()
+    {
+        // Arrange
+        var paymentRequest = CreateValidPaymentRequest();
+        paymentRequest.Cvv = "1234"; 
+
+        // Act
+        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        
+        // Assert
+        Assert.True(isValid);
+    }
+
+    [Fact]
+    public async Task Cvv_IsTooLong()
+    {
+        // Arrange
+        var paymentRequest = CreateValidPaymentRequest();
+        paymentRequest.Cvv = "00123"; 
+
+        // Act
+        var isValid = PaymentValidators.isValid(paymentRequest, out List<string> validationErrors);
+        
+        // Assert
+        Assert.False(isValid);
+        Assert.Contains("Cvv must contain between 3 and 4 numeric characters", validationErrors);
     }
 
 }

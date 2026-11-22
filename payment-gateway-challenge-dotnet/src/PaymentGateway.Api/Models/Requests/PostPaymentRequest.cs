@@ -7,5 +7,5 @@ public class PostPaymentRequest
     public int ExpiryYear { get; set; }
     public required string Currency { get; set; }
     public int Amount { get; set; }
-    public string Cvv { get; set; }
+    public required string Cvv { get; set; }
 }

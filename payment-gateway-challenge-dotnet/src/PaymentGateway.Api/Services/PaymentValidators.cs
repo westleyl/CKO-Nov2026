@@ -63,6 +63,21 @@ public static class PaymentValidators
             validationErrors.Add("Amount must be greater than zero");
         }
 
+        // Cvv
+        if (string.IsNullOrEmpty(paymentRequest.Cvv))
+        {
+            validationErrors.Add("Cvv is required");
+        }
+        else if(paymentRequest.Cvv.Length < 3 || paymentRequest.Cvv.Length > 4)
+        {
+            validationErrors.Add("Cvv must contain between 3 and 4 numeric characters");
+        }
+        else if(!paymentRequest.Cvv.All(char.IsDigit))
+        {
+            validationErrors.Add("Cvv must contain numeric characters (0-9) only");
+        }
+
+
         return validationErrors.Count == 0;
     }
 }
