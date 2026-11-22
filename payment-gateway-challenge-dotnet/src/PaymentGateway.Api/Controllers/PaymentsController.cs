@@ -19,7 +19,7 @@ public class PaymentsController : Controller
     {
         _paymentsRepository = paymentsRepository;
 
-        // would locate this from some service registry
+        // would locate this from some service registry / via dependency injection into this controller
         _acquiringBankApi = new HttpClient();
         _acquiringBankApi.BaseAddress = new System.Uri("http://localhost:8080/payments");
     }
